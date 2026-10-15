@@ -1,0 +1,3 @@
+export default function DataTable({ columns, rows, empty }) {
+  return <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm"><table className="min-w-full text-left text-sm"><thead className="border-b border-gray-200 bg-gray-50"><tr>{columns.map(column => <th className="whitespace-nowrap px-4 py-3 font-semibold" key={column}>{column}</th>)}</tr></thead><tbody className="divide-y divide-gray-100">{rows.length ? rows.map((row, index) => <tr className="hover:bg-gray-50" key={index}>{row.map((cell, cellIndex) => <td className="whitespace-nowrap px-4 py-3 text-gray-600" key={cellIndex}>{cell}</td>)}</tr>) : <tr><td className="px-4 py-8 text-center text-gray-500" colSpan={columns.length}>{empty}</td></tr>}</tbody></table></div>;
+}

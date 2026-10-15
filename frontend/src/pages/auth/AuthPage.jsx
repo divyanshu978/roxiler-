@@ -1,0 +1,13 @@
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { api, saveSession } from "../../services/api";
+import { buttonClass } from "../../utils/constants";
+import Field from "../../components/common/Field";
+import Message from "../../components/common/Message";
+
+export default function AuthPage({ register = false }) {
+  const navigate = useNavigate(), [form, setForm] = useState({ name: "", email: "", address: "", password: "" }), [error, setError] = useState(""), [busy, setBusy] = useState(false);
+  const update = event => setForm({ ...form, [event.target.name]: event.target.value });
+  async function submit(event) { event.preventDefault(); setError(""); setBusy(true); try { const session = await api(register ? "/auth/register" : "/auth/login", { method: "POST", body: register ? form : { email: form.email, password: form.password } }); saveSession(session); navigate(session.user.role === "ADMIN" ? "/admin" : session.user.role === "STORE_OWNER" ? "/owner" : "/stores", { replace: true }); } catch (err) { setError(err.message); } finally { setBusy(false); } }
+  return <main className="flex min-h-screen items-center justify-center bg-white px-4 py-10"><section className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-7 shadow-sm"><div className="mb-8"><p className="text-sm font-semibold uppercase tracking-widest text-gray-500">Roxiler</p><h1 className="mt-2 text-3xl font-bold">{register ? "Create account" : "Welcome back"}</h1><p className="mt-2 text-sm text-gray-500">{register ? "Join the store rating platform." : "Sign in to continue to your dashboard."}</p></div><form className="space-y-4" onSubmit={submit}>{register && <Field label="Full name" name="name" value={form.name} onChange={update} minLength={20} maxLength={60} required placeholder="At least 20 characters" />}<Field label="Email" name="email" type="email" value={form.email} onChange={update} required />{register && <Field label="Address" name="address" value={form.address} onChange={update} maxLength={400} required />}<Field label="Password" name="password" type="password" value={form.password} onChange={update} minLength={8} maxLength={16} required /><Message error={error} /><button className={`${buttonClass} w-full`} disabled={busy}>{busy ? "Please wait..." : register ? "Create account" : "Sign in"}</button></form><p className="mt-6 text-center text-sm text-gray-500">{register ? "Already have an account?" : "New to Roxiler?"}{" "}<Link className="font-semibold text-black underline" to={register ? "/login" : "/register"}>{register ? "Sign in" : "Create an account"}</Link></p></section></main>;
+}
